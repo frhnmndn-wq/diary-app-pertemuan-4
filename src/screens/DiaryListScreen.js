@@ -1,133 +1,118 @@
 import React, { useMemo, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  FlatList, 
-  useWindowDimensions,
-  Image 
-} from 'react-native';
-
-import DiaryCard from '../components/DiaryCard';
+import { View, Text, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import { COLORS, SPACE, TYPO, BREAKPOINTS } from '../styles/tokens';
-import DiaryDetailModal from '../components/DiaryDetailModal'; 
+import DiaryCard from '../components/DiaryCard';
+import DiaryDetailModal from '../components/DiaryDetailModal';
+import SearchBar from '../components/SearchBar';
+import EntryForm from '../components/EntryForm';
 
-const DATA = [
+const INITIAL_ENTRIES = [
   {
     id: 1,
     title: 'Pagi yang Tenang',
-    date: '2025-10-06',
-    preview: 'Bangun lebih pagi...',
-    body: 'Catatan lengkap: Hari ini aku bangun lebih pagi dan berjalan kaki 20 menit. Udara terasa sejuk dan menyegarkan pikiran sebelum mulai beraktivitas.',
-    // Sesuai instruksi gambar, data sekarang membutuhkan moodUri dan heroUri
-    // Saya tetap menyisipkan fallback require() jika ingin pakai gambar lokal untuk tugas
-    moodUri: require('../../assets/moods/happy.png'), 
-    heroUri: 'https://picsum.photos/seed/happyhero/800/450',
-    mood: 'happy',
+    date: '2026-10-18',
+    preview: 'Jalan pagi 20 menit dan menikmati udara segar.',
+    body: 'Hari ini aku bangun lebih pagi dan berjalan kaki selama 20 menit.',
+    moodImage: require('../assets/images/happy.png'),
   },
   {
     id: 2,
     title: 'Produktif di Kampus',
-    date: '2025-10-05',
-    preview: 'Menyelesaikan modul...',
-    body: 'Kemajuan proyek: Menyelesaikan modul praktikum dan berdiskusi dengan tim. Banyak insight baru yang didapatkan hari ini.',
-    moodUri: { uri: 'https://picsum.photos/seed/focus/200' },
-    heroUri: 'https://picsum.photos/seed/focushero/800/450',
-    mood: 'focus',
+    date: '2026-10-17',
+    preview: 'Menyelesaikan modul praktikum dan berdiskusi dengan tim.',
+    body: 'Hari ini cukup produktif karena beberapa target perkuliahan selesai.',
+    moodImage: require('../assets/images/focus.png'),
   },
   {
     id: 3,
     title: 'Senja di Taman',
-    date: '2025-10-04',
-    preview: 'Membaca buku...',
-    body: 'Refleksi singkat: Menikmati senja sambil membaca buku favorit. Warna langit sangat indah membuat pikiran menjadi tenang.',
-    moodUri: { uri: 'https://picsum.photos/seed/calm/200' },
-    heroUri: 'https://picsum.photos/seed/calmhero/800/450',
-    mood: 'calm',
-  },
-  {
-    id: 4,
-    title: 'Hujan Deras',
-    date: '2025-10-03',
-    preview: 'Hujan deras turun...',
-    body: 'Hujan deras turun sejak siang. Menghabiskan waktu dengan menonton film dan minum cokelat panas di dalam kamar.',
-    moodUri: { uri: 'https://picsum.photos/seed/sad/200' },
-    heroUri: 'https://picsum.photos/seed/sadhero/800/450',
-    mood: 'sad',
-  },
-  {
-    id: 5,
-    title: 'Proyek Selesai!',
-    date: '2025-10-02',
-    preview: 'Akhirnya proyek...',
-    body: 'Akhirnya proyek akhir bulan ini selesai dan dipresentasikan dengan lancar. Sangat lega rasanya bisa bernapas lega.',
-    moodUri: { uri: 'https://picsum.photos/seed/excited/200' },
-    heroUri: 'https://picsum.photos/seed/excitedhero/800/450',
-    mood: 'excited',
+    date: '2026-10-16',
+    preview: 'Membaca buku sambil menikmati suasana senja.',
+    body: 'Sore ini saya menikmati waktu di taman sambil membaca buku.',
+    moodImage: require('../assets/images/calm.png'),
   },
 ];
 
 export default function DiaryListScreen() {
-  // Hook untuk menentukan dimensi layar
   const { width } = useWindowDimensions();
-  // Jika lebar layar >= 600px (tablet), maka twoCols bernilai true
   const twoCols = width >= BREAKPOINTS.tablet;
-  
-  // State untuk menyimpan data yang dipilih untuk ditampilkan di Modal
+
+  const [entries, setEntries] = useState(INITIAL_ENTRIES);
+  const [query, setQuery] = useState('');
+  const [likedIds, setLikedIds] = useState(new Set());
   const [selected, setSelected] = useState(null);
 
-  // Fungsi untuk merender setiap item/kartu
+  const filtered = useMemo(() => {
+    if (!query.trim()) return entries;
+    const q = query.toLowerCase();
+    
+    return entries.filter((entry) =>
+      entry.title.toLowerCase().includes(q) ||
+      entry.preview.toLowerCase().includes(q) ||
+      entry.date.toLowerCase().includes(q)
+    );
+  }, [entries, query]);
+
+  const toggleLike = (id) => {
+    setLikedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const addEntry = (newEntry) => {
+    setEntries((prev) => [newEntry, ...prev]);
+  };
+
   const renderItem = ({ item }) => (
     <View style={[styles.itemWrap, twoCols && styles.itemWrap2]}>
       <DiaryCard
         title={item.title}
         date={item.date}
         preview={item.preview}
-        // Pastikan prop di DiaryCard Anda bernama imageSource (sesuai perbaikan sebelumnya)
-        imageSource={item.moodUri} 
-        mood={item.mood}
-        variant={twoCols ? 'grid' : 'list'}
+        moodImage={item.moodImage}
+        liked={likedIds.has(item.id)}
+        onToggleLike={() => toggleLike(item.id)}
         onPress={() => setSelected(item)}
       />
     </View>
   );
 
-  // useMemo untuk merestart/mengatur ulang FlatList saat jumlah kolom berubah (dari 1 ke 2 atau sebaliknya)
   const keyForCols = useMemo(() => (twoCols ? 'grid2' : 'list1'), [twoCols]);
+
+  // KUNCI PERBAIKAN: Membungkus Header, Search, dan Form ke dalam satu komponen
+  const listHeader = (
+    <View style={styles.headerSection}>
+      <Text style={styles.headerTitle}>Buku Harian</Text>
+      <SearchBar onChange={setQuery} />
+      <EntryForm onSubmit={addEntry} />
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      {/* Header dengan Avatar (Tambahan Tugas) */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.header}>Buku Harian</Text>
-        <Image 
-          source={{ uri: 'https://picsum.photos/seed/avatar/100' }} 
-          style={styles.avatar} 
-        />
-      </View>
-
       <FlatList
         key={keyForCols}
-        data={DATA}
-        numColumns={twoCols ? 2 : 1}
-        keyExtractor={(it) => String(it.id)}
+        data={filtered}
+        keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
-        // Jarak antar kolom jika menggunakan mode grid (2 kolom)
-        columnWrapperStyle={twoCols ? { gap: SPACE.m } : undefined}
-        contentContainerStyle={{
-          padding: SPACE.l,
-          gap: SPACE.m,
-          paddingTop: SPACE.m, // Sedikit diubah agar tidak menabrak header
-        }}
+        numColumns={twoCols ? 2 : 1}
+        // Memasukkan listHeader ke dalam area yang bisa di-scroll
+        ListHeaderComponent={listHeader}
+        columnWrapperStyle={twoCols ? { gap: SPACE.m, paddingHorizontal: SPACE.l } : undefined}
+        contentContainerStyle={styles.listContent}
         ListEmptyComponent={
           <Text style={styles.empty}>Belum ada entri.</Text>
         }
       />
-
-      {/* Komponen Modal untuk menampilkan detail saat kartu ditekan */}
-      {/* Jika file DiaryDetailModal belum dibuat, Anda bisa memberikan komentar (//) pada blok di bawah ini */}
+      
       <DiaryDetailModal
-        visible={!!selected} // Bernilai true jika ada item yang 'selected'
+        visible={!!selected}
         entry={selected}
         onClose={() => setSelected(null)}
       />
@@ -136,38 +121,34 @@ export default function DiaryListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: COLORS.surface 
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACE.l,
-    paddingTop: SPACE.l,
+  headerSection: {
+    paddingBottom: SPACE.m,
   },
-  header: {
+  headerTitle: {
     fontSize: TYPO.h1,
     fontWeight: '700',
+    paddingHorizontal: SPACE.l,
+    paddingTop: SPACE.l,
     color: COLORS.text,
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: COLORS.accent,
+  listContent: {
+    paddingBottom: SPACE.xl, // Memberi jarak lega di bagian paling bawah
   },
   itemWrap: { 
-    flex: 1 
+    flex: 1,
+    paddingHorizontal: SPACE.l,
   },
   itemWrap2: { 
-    flex: 1 / 2 // Lebar 50% untuk setiap kartu di mode tablet
+    flex: 1 / 2,
+    paddingHorizontal: 0, 
   },
-  empty: { 
-    textAlign: 'center', 
-    color: COLORS.muted, 
-    marginTop: 40 
+  empty: {
+    textAlign: 'center',
+    color: COLORS.muted,
+    marginTop: 40,
   },
 });
