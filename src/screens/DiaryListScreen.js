@@ -13,7 +13,7 @@ const INITIAL_ENTRIES = [
     date: '2026-10-18',
     preview: 'Jalan pagi 20 menit dan menikmati udara segar.',
     body: 'Hari ini aku bangun lebih pagi dan berjalan kaki selama 20 menit.',
-    moodImage: require('../assets/images/happy.png'),
+    moodImage: require('../../assets/moods/happy.png'),
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const INITIAL_ENTRIES = [
     date: '2026-10-17',
     preview: 'Menyelesaikan modul praktikum dan berdiskusi dengan tim.',
     body: 'Hari ini cukup produktif karena beberapa target perkuliahan selesai.',
-    moodImage: require('../assets/images/focus.png'),
+    moodImage: require('../../assets/moods/focus.png'),
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ const INITIAL_ENTRIES = [
     date: '2026-10-16',
     preview: 'Membaca buku sambil menikmati suasana senja.',
     body: 'Sore ini saya menikmati waktu di taman sambil membaca buku.',
-    moodImage: require('../assets/images/calm.png'),
+    moodImage: require('../../assets/moods/calm.png'),
   },
 ];
 
@@ -79,13 +79,13 @@ export default function DiaryListScreen() {
         liked={likedIds.has(item.id)}
         onToggleLike={() => toggleLike(item.id)}
         onPress={() => setSelected(item)}
+        variant={twoCols ? 'grid' : 'list'}
       />
     </View>
   );
 
   const keyForCols = useMemo(() => (twoCols ? 'grid2' : 'list1'), [twoCols]);
 
-  // KUNCI PERBAIKAN: Membungkus Header, Search, dan Form ke dalam satu komponen
   const listHeader = (
     <View style={styles.headerSection}>
       <Text style={styles.headerTitle}>Buku Harian</Text>
@@ -102,7 +102,6 @@ export default function DiaryListScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
         numColumns={twoCols ? 2 : 1}
-        // Memasukkan listHeader ke dalam area yang bisa di-scroll
         ListHeaderComponent={listHeader}
         columnWrapperStyle={twoCols ? { gap: SPACE.m, paddingHorizontal: SPACE.l } : undefined}
         contentContainerStyle={styles.listContent}
@@ -121,34 +120,11 @@ export default function DiaryListScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.surface,
-  },
-  headerSection: {
-    paddingBottom: SPACE.m,
-  },
-  headerTitle: {
-    fontSize: TYPO.h1,
-    fontWeight: '700',
-    paddingHorizontal: SPACE.l,
-    paddingTop: SPACE.l,
-    color: COLORS.text,
-  },
-  listContent: {
-    paddingBottom: SPACE.xl, // Memberi jarak lega di bagian paling bawah
-  },
-  itemWrap: { 
-    flex: 1,
-    paddingHorizontal: SPACE.l,
-  },
-  itemWrap2: { 
-    flex: 1 / 2,
-    paddingHorizontal: 0, 
-  },
-  empty: {
-    textAlign: 'center',
-    color: COLORS.muted,
-    marginTop: 40,
-  },
+  container: { flex: 1, backgroundColor: COLORS.surface },
+  headerSection: { paddingBottom: SPACE.m },
+  headerTitle: { fontSize: TYPO.h1, fontWeight: '700', paddingHorizontal: SPACE.l, paddingTop: SPACE.l, color: COLORS.text },
+  listContent: { paddingBottom: SPACE.xl },
+  itemWrap: { flex: 1, paddingHorizontal: SPACE.l },
+  itemWrap2: { flex: 1 / 2, paddingHorizontal: 0 },
+  empty: { textAlign: 'center', color: COLORS.muted, marginTop: 40 },
 });

@@ -10,7 +10,6 @@ export default function SearchBar({
 
   const handleChange = (text) => {
     setQueryText(text);
-    // Memanggil fungsi onChange dari props jika ada
     onChange?.(text);
   };
 

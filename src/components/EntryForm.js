@@ -4,11 +4,9 @@ import { COLORS, SPACE, RADIUS, TYPO } from '../styles/tokens';
 
 export default function EntryForm({ onSubmit }) {
   const [title, setTitle] = useState('');
-  // Menggunakan tanggal hari ini sebagai default
-  const [date, setDate] = useState('2026-10-20');
+  const [date, setDate] = useState('2026-10-21');
   const [preview, setPreview] = useState('');
 
-  // Validasi: tombol submit hanya aktif jika title dan preview tidak kosong
   const canSubmit = title.trim().length > 0 && preview.trim().length > 0;
 
   const submit = () => {
@@ -20,13 +18,11 @@ export default function EntryForm({ onSubmit }) {
       date: date.trim(),
       preview: preview.trim(),
       body: preview.trim(),
-      // Telah diubah menggunakan URL internet agar tidak error mencari file lokal
-      moodImage: require('../assets/images/default.png'),
+      moodImage: require('../../assets/moods/default.png'), 
     });
     
-    // Reset form setelah disubmit
     setTitle('');
-    setDate('2026-10-20');
+    setDate('2026-10-21');
     setPreview('');
   };
 
@@ -72,40 +68,11 @@ export default function EntryForm({ onSubmit }) {
 }
 
 const styles = StyleSheet.create({
-  form: { 
-    padding: SPACE.l, 
-    gap: SPACE.s 
-  },
-  heading: {
-    fontSize: TYPO.title,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: SPACE.s,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: RADIUS.card,
-    paddingHorizontal: SPACE.m,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-  },
-  multiline: {
-    minHeight: 80,
-    textAlignVertical: 'top',
-  },
-  button: {
-    marginTop: SPACE.s,
-    padding: SPACE.m,
-    borderRadius: RADIUS.card,
-    backgroundColor: COLORS.accent,
-    alignItems: 'center',
-  },
-  buttonDisabled: { 
-    opacity: 0.5 
-  },
-  buttonText: { 
-    color: '#fff', 
-    fontWeight: '700' 
-  },
+  form: { padding: SPACE.l, gap: SPACE.s },
+  heading: { fontSize: TYPO.title, fontWeight: '700', color: COLORS.text, marginBottom: SPACE.s },
+  input: { borderWidth: 1, borderColor: COLORS.border, borderRadius: RADIUS.card, paddingHorizontal: SPACE.m, paddingVertical: 10, backgroundColor: '#fff' },
+  multiline: { minHeight: 80, textAlignVertical: 'top' },
+  button: { marginTop: SPACE.s, padding: SPACE.m, borderRadius: RADIUS.card, backgroundColor: COLORS.accent, alignItems: 'center' },
+  buttonDisabled: { opacity: 0.5 },
+  buttonText: { color: '#fff', fontWeight: '700' },
 });

@@ -10,40 +10,38 @@ export default function DiaryCard({
   liked = false,
   onPress = () => {},
   onToggleLike = () => {},
+  variant = 'list'
 }) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [{ opacity: pressed ? 0.85 : 1 }]}
+      style={({ pressed }) => [
+        styles.card,
+        variant === 'grid' && styles.cardGrid,
+        { opacity: pressed ? 0.85 : 1 }
+      ]}
       accessible={true}
       accessibilityLabel={`Entri ${title} tanggal ${date}`}
     >
-      <View style={styles.card}>
-        <Image source={moodImage} style={styles.mood} />
-        
-        <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={1}>
-            {title}
-          </Text>
-          <Text style={styles.date}>{date}</Text>
-          <Text 
-            style={styles.preview} 
-            numberOfLines={3} 
-            ellipsizeMode="tail"
-          >
-            {preview}
-          </Text>
-        </View>
-
-        {/* Tombol Like */}
-        <Pressable
-          onPress={onToggleLike}
-          hitSlop={8}
-          accessibilityLabel={liked ? 'Batal suka' : 'Suka'}
-        >
-          <Text style={styles.like}>{liked ? '❤️' : '🤍'}</Text>
-        </Pressable>
+      <Image source={moodImage} style={styles.mood} />
+      
+      <View style={styles.content}>
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
+        <Text style={styles.date}>{date}</Text>
+        <Text style={styles.preview} numberOfLines={3} ellipsizeMode="tail">
+          {preview}
+        </Text>
       </View>
+
+      <Pressable
+        onPress={onToggleLike}
+        hitSlop={8}
+        accessibilityLabel={liked ? 'Batal suka' : 'Suka'}
+      >
+        <Text style={styles.like}>{liked ? '❤️' : '🤍'}</Text>
+      </Pressable>
     </Pressable>
   );
 }
@@ -58,6 +56,10 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.card,
     backgroundColor: COLORS.surface,
     alignItems: 'center',
+    marginBottom: SPACE.m,
+  },
+  cardGrid: {
+    flexDirection: 'column',
   },
   mood: {
     width: 64,
